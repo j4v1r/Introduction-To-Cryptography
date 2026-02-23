@@ -5,7 +5,6 @@
 
 import random
 
-
 #Función para calcular el máximo común divisor (gcd) de dos números a y b utilizando el algoritmo de Euclides.
 def gcd(a, b):
     
@@ -64,6 +63,7 @@ def main():
 
     Zna=Zn_asterisco(n)
     print("El conjunto Z"+str(n)+"* es:", Zna)
+    
     
     #Validar que el usuario ingrese un número entero perteneciente a Zn* para a.
     while True:
