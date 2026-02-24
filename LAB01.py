@@ -83,7 +83,6 @@ def decipher(ciphertext, a, b, plaintext):
         c = ord(caracter) - 32
         text = ((a_inv * (c-b)) % n) + 32 # Mantiene los caracteres dentro del rango 32 - 126
         deciphered += chr(text)
-    print("destino")
     
     with open(plaintext, 'w', encoding='utf-8') as salida:
         salida.write(deciphered)
@@ -168,3 +167,4 @@ def main():
 if __name__ == "__main__":
 
     main()
+
