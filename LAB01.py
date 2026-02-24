@@ -58,7 +58,6 @@ def affine_cipher(plaintext, a, b, ciphertext):
     for caracter in text:
         m = ord(caracter) - 32 
         cipher = ((a * m + b) % n) + 32 # Mantiene los caracteres dentro del rango 32 - 126
-        print(cipher)
         ciphered += chr(cipher)
     
     
@@ -167,4 +166,5 @@ def main():
 if __name__ == "__main__":
 
     main()
+
 
