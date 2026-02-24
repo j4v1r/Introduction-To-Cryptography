@@ -46,6 +46,49 @@ def keygen():
     b = inversoPrimo(95, a, Znkey)
     
     return a, b
+
+#Función de cifrado
+def affine_cipher(plaintext, a, b, ciphertext):
+    ciphered = ""
+    n = 95
+
+    with open(plaintext, 'r', encoding='utf-8') as fuente:
+        text = fuente.read()
+
+    for caracter in text:
+        m = ord(caracter) - 32 
+        cipher = ((a * m + b) % n) + 32 # Mantiene los caracteres dentro del rango 32 - 126
+        print(cipher)
+        ciphered += chr(cipher)
+    
+    
+    with open(ciphertext, 'w', encoding='utf-8') as salida:
+        salida.write(ciphered)
+    
+    print("El mensaje fue encriptado en ", ciphertext)
+
+#Función de descifrado
+def decipher(ciphertext, a, b, plaintext):
+    deciphered = ""
+    n = 95
+
+    Zn = Zn_asterisco(n)
+
+    a_inv = inversoPrimo(n, a, Zn)
+
+    with open(ciphertext, 'r', encoding='utf-8') as fuente:
+        cipher = fuente.read()
+
+    for caracter in cipher:
+        c = ord(caracter) - 32
+        text = ((a_inv * (c-b)) % n) + 32 # Mantiene los caracteres dentro del rango 32 - 126
+        deciphered += chr(text)
+    print("destino")
+    
+    with open(plaintext, 'w', encoding='utf-8') as salida:
+        salida.write(deciphered)
+
+    print("El mensaje ha sido decifrado en ", plaintext)
             
     
 def main():
@@ -83,6 +126,45 @@ def main():
     a, b = keygen()
     print("La clave generada es: K("+str(a)+","+str(b)+")")
     
+    #Verificación de llave ingresada por el usuario
+    while True:
+        try:
+            k_a = int(input("Ingresa el valor de a: "))
+            k_b = int(input("Ingresa el valor de b: "))
+            if (k_a in Zna) and (k_b <= 9595):
+                break
+            else:
+                print("La llave no es válida. Intente de nuevo.")
+        except ValueError:
+            print("Entrada no válida. Por favor, ingresa un número entero.")
+
+    #Verificación de la existencia del archivo fuente
+    while True:
+        fuente = input("Ingrese el nombre del archivo fuente + extensión: ")
+        try:
+            with open(fuente, 'r') as f:
+                f.close()
+                break
+        except FileNotFoundError:
+            print("El archivo no existe. Intente de nuevo")
+        
+    destino = input("Ingrese el nombre del archivo destino + extensión: ")
+
+    #Menú de opciones
+    while True:
+        try:
+            opcion = input("-- Selecciona una opción -- \nA. Cifrar \nB. Descifrar\n").upper()
+            if opcion == 'A':
+                affine_cipher(fuente, k_a, k_b, destino)
+                break
+            elif opcion == 'B':
+                decipher(fuente, k_a, k_b, destino)
+                break
+            else:
+                print("Opción no válida. Por favor, ingrese una de las opciones disponibles.")
+        except ValueError:
+            print("Entrada no válida. Por favor, ingresa un caracter.")
     
 if __name__ == "__main__":
+
     main()
