@@ -45,7 +45,7 @@ def keygen():
     a = random.choice(Znkey)
     b = inversoPrimo(95, a, Znkey)
     
-    return a, b
+    return a, b, Znkey
 
 #Función de cifrado
 def affine_cipher(plaintext, a, b, ciphertext):
@@ -64,7 +64,7 @@ def affine_cipher(plaintext, a, b, ciphertext):
     with open(ciphertext, 'w', encoding='utf-8') as salida:
         salida.write(ciphered)
     
-    print("El mensaje fue encriptado en ", ciphertext)
+    print("El mensaje fue encriptado en", ciphertext)
 
 #Función de descifrado
 def decipher(ciphertext, a, b, plaintext):
@@ -86,83 +86,122 @@ def decipher(ciphertext, a, b, plaintext):
     with open(plaintext, 'w', encoding='utf-8') as salida:
         salida.write(deciphered)
 
-    print("El mensaje ha sido decifrado en ", plaintext)
+    print("El mensaje ha sido decifrado en", plaintext)
             
     
 def main():
     
-    #Validar que el usuario ingrese un número entero mayor o igual a 2 para n.
+    #Menu Principal
     while True:
-        try:
-            n = int(input("Ingresa un número mayor o igual a 2: "))
-            if n >= 2:
-                break;
-            else:
-                print("Entrada no válida. Por favor, ingresa un número mayor o igual a 2.")
-        except ValueError:
-            print("Entrada no válida. Por favor, ingresa un número entero.")
-
-    Zna=Zn_asterisco(n)
-    print("El conjunto Z"+str(n)+"* es:", Zna)
-    
-    
-    #Validar que el usuario ingrese un número entero perteneciente a Zn* para a.
-    while True:
-        try:
-            a = int(input("Ingresa un número mayor o igual a 2: "))
-            if a in Zna:
-                break;
-            else:
-                print("Entrada no válida. Por favor, ingresa un número perteneciente a Z"+str(n)+"*.")
-        except ValueError:
-            print("Entrada no válida. Por favor, ingresa un número entero.")
-
-    b =  inversoPrimo(n, a, Zna)
-    print("El inverso multiplicativo de", a, "en Z"+str(n)+"* es:", b)
-    
-    #Se desempaqueta la tupla devuelta por la función keygen()
-    a, b = keygen()
-    print("La clave generada es: K("+str(a)+","+str(b)+")")
-    
-    #Verificación de llave ingresada por el usuario
-    while True:
-        try:
-            k_a = int(input("Ingresa el valor de a: "))
-            k_b = int(input("Ingresa el valor de b: "))
-            if (k_a in Zna) and (k_b <= 9595):
-                break
-            else:
-                print("La llave no es válida. Intente de nuevo.")
-        except ValueError:
-            print("Entrada no válida. Por favor, ingresa un número entero.")
-
-    #Verificación de la existencia del archivo fuente
-    while True:
-        fuente = input("Ingrese el nombre del archivo fuente + extensión: ")
-        try:
-            with open(fuente, 'r') as f:
-                f.close()
-                break
-        except FileNotFoundError:
-            print("El archivo no existe. Intente de nuevo")
+        print("---- LAB01 - AFFINE CIPHER ----")
+        print("Select an option: \n1. Calculate gcd of a and b \n2. Create Zn* list \n3. Find the multiplicative inverse of a in Zn* \n4. Generate random key K(a,b) \n5. Cipher a message \n6. Decipher message \n7. Exit")
         
-    destino = input("Ingrese el nombre del archivo destino + extensión: ")
+        opcion = input("Option: ")
+            
+        match opcion:
+            case '1':
+                #Validar que el usuario ingrese dos números enteros para a y b. Calcular el máximo común divisor de a y b.
+                while True:
+                    try:
+                        a = int(input("Ingresa el valor de a: "))
+                        b = int(input("Ingresa el valor de b: "))
+                        break
+                    except ValueError:
+                        print("Entrada no válida. Por favor, ingresa números enteros.")
 
-    #Menú de opciones
-    while True:
-        try:
-            opcion = input("-- Selecciona una opción -- \nA. Cifrar \nB. Descifrar\n").upper()
-            if opcion == 'A':
-                affine_cipher(fuente, k_a, k_b, destino)
-                break
-            elif opcion == 'B':
-                decipher(fuente, k_a, k_b, destino)
-                break
-            else:
-                print("Opción no válida. Por favor, ingrese una de las opciones disponibles.")
-        except ValueError:
-            print("Entrada no válida. Por favor, ingresa un caracter.")
+                resultado = gcd(a, b)
+                print("El máximo común divisor de", a, "y", b, "es:", resultado)
+                
+            case '2':
+                #Validar que el usuario ingrese un número entero mayor o igual a 2 para n.
+                while True:
+                    try:
+                        n = int(input("Ingresa un número mayor o igual a 2: "))
+                        if n >= 2:
+                            break;
+                        else:
+                            print("Entrada no válida. Por favor, ingresa un número mayor o igual a 2.")
+                    except ValueError:
+                        print("Entrada no válida. Por favor, ingresa un número entero.")
+
+                Zna=Zn_asterisco(n)
+                print("El conjunto Z"+str(n)+"* es:", Zna) 
+
+            case '3':
+                #Validar que el usuario ingrese un número entero perteneciente a Zn* para a.
+                while True:
+                    try:
+                        a = int(input("Ingresa un número mayor o igual a 2: "))
+                        if a in Zna:
+                            break;
+                        else:
+                            print("Entrada no válida. Por favor, ingresa un número perteneciente a Z"+str(n)+"*.")
+                    except ValueError:
+                        print("Entrada no válida. Por favor, ingresa un número entero.")
+
+                b =  inversoPrimo(n, a, Zna)
+                print("El inverso multiplicativo de", a, "en Z"+str(n)+"* es:", b)
     
+            case '4':
+                #Se desempaqueta la tupla devuelta por la función keygen()
+                a, b, Znkey = keygen()
+                print("La llave aleatoria generada es: K("+str(a)+","+str(b)+")")
+    
+            case '5':
+                #Verificación de llave ingresada por el usuario
+                while True:
+                    try:
+                        k_a = int(input("Ingresa el valor de a: "))
+                        k_b = int(input("Ingresa el valor de b: "))
+                        if (k_a in Znkey) and (k_b <= 9595):
+                            break
+                        else:
+                            print("La llave no es válida. Intente de nuevo.")
+                    except ValueError:
+                        print("Entrada no válida. Por favor, ingresa un número entero.")
+                        
+                #Verificación de la existencia del archivo fuente
+                while True:
+                    fuente = input("Ingrese el nombre del archivo fuente + extensión: ")
+                    try:
+                        with open(fuente, 'r') as f:
+                            f.close()
+                            break
+                    except FileNotFoundError:
+                        print("El archivo no existe. Intente de nuevo")
+                
+                affine_cipher(fuente, k_a, k_b, fuente)
+
+            case '6':
+                #Verificación de llave ingresada por el usuario
+                while True:
+                    try:
+                        k_a = int(input("Ingresa el valor de a: "))
+                        k_b = int(input("Ingresa el valor de b: "))
+                        if (k_a in Znkey) and (k_b <= 9595):
+                            break
+                        else:
+                            print("La llave no es válida. Intente de nuevo.")
+                    except ValueError:
+                        print("Entrada no válida. Por favor, ingresa un número entero.")
+                        
+                #Verificación de la existencia del archivo fuente
+                while True:
+                    destino = input("Ingrese el nombre del archivo fuente + extensión: ")
+                    try:
+                        with open(fuente, 'r') as f:
+                            f.close()
+                            break
+                    except FileNotFoundError:
+                        print("El archivo no existe. Intente de nuevo")
+                
+                decipher(fuente, k_a, k_b, destino)
+                
+            case '7':
+                print("Saliendo del programa...")
+                break
+            
+                
 if __name__ == "__main__":
 
     main()
