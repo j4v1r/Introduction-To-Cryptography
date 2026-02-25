@@ -52,6 +52,9 @@ def affine_cipher(plaintext, a, b, ciphertext):
     ciphered = ""
     n = 95
 
+    Zn = Zn_asterisco(n)
+    a_inv = inversoPrimo(n, a, Zn)
+
     with open(plaintext, 'r', encoding='utf-8') as fuente:
         text = fuente.read()
 
@@ -68,6 +71,8 @@ def affine_cipher(plaintext, a, b, ciphertext):
         salida.write(ciphered)
     
     print("El mensaje fue encriptado en", ciphertext)
+    print("\na⁻¹: ",a_inv)
+    print("a⁻¹ mod ",n,": ",a_inv % n)
 
 #Función de descifrado
 def decipher(ciphertext, a, b, plaintext):
@@ -93,6 +98,8 @@ def decipher(ciphertext, a, b, plaintext):
         salida.write(deciphered)
 
     print("El mensaje ha sido decifrado en", plaintext)
+    print("\na⁻¹: ",a_inv)
+    print("a⁻¹ mod ",n,": ",a_inv % n)
             
     
 def main():
@@ -217,6 +224,7 @@ def main():
 if __name__ == "__main__":
 
     main()
+
 
 
 
