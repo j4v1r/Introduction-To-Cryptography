@@ -52,19 +52,27 @@ def affine_cipher(plaintext, a, b, ciphertext):
     ciphered = ""
     n = 95
 
+    Zn = Zn_asterisco(n)
+    a_inv = inversoPrimo(n, a, Zn)
+
     with open(plaintext, 'r', encoding='utf-8') as fuente:
         text = fuente.read()
 
     for caracter in text:
-        m = ord(caracter) - 32 
-        cipher = ((a * m + b) % n) + 32 # Mantiene los caracteres dentro del rango 32 - 126
-        ciphered += chr(cipher)
+        if caracter == '\n':
+            ciphered += '\n'
+        else:
+            m = ord(caracter) - 32 
+            cipher = ((a * m + b) % n) + 32 # Mantiene los caracteres dentro del rango 32 - 126
+            ciphered += chr(cipher)
     
     
     with open(ciphertext, 'w', encoding='utf-8') as salida:
         salida.write(ciphered)
     
     print("El mensaje fue encriptado en", ciphertext)
+    print("\na⁻¹: ",a_inv)
+    print("a⁻¹ mod ",n,": ",a_inv % n)
 
 #Función de descifrado
 def decipher(ciphertext, a, b, plaintext):
@@ -79,14 +87,19 @@ def decipher(ciphertext, a, b, plaintext):
         cipher = fuente.read()
 
     for caracter in cipher:
-        c = ord(caracter) - 32
-        text = ((a_inv * (c-b)) % n) + 32 # Mantiene los caracteres dentro del rango 32 - 126
-        deciphered += chr(text)
+        if caracter == '\n':
+            deciphered += '\n'
+        else:
+            c = ord(caracter) - 32
+            text = ((a_inv * (c-b)) % n) + 32 # Mantiene los caracteres dentro del rango 32 - 126
+            deciphered += chr(text)
     
     with open(plaintext, 'w', encoding='utf-8') as salida:
         salida.write(deciphered)
 
     print("El mensaje ha sido decifrado en", plaintext)
+    print("\na⁻¹: ",a_inv)
+    print("a⁻¹ mod ",n,": ",a_inv % n)
             
     
 def main():
@@ -148,12 +161,13 @@ def main():
                 print("La llave aleatoria generada es: K("+str(a)+","+str(b)+")")
     
             case '5':
+                Znkey = Zn_asterisco(95)
                 #Verificación de llave ingresada por el usuario
                 while True:
                     try:
                         k_a = int(input("Ingresa el valor de a: "))
                         k_b = int(input("Ingresa el valor de b: "))
-                        if (k_a in Znkey) and (k_b <= 9595):
+                        if (k_a in Znkey) and (k_b <= 95):
                             break
                         else:
                             print("La llave no es válida. Intente de nuevo.")
@@ -169,16 +183,19 @@ def main():
                             break
                     except FileNotFoundError:
                         print("El archivo no existe. Intente de nuevo")
+
+                destino = input("Ingrese el nombre del archivo destino + extensión: ")
                 
-                affine_cipher(fuente, k_a, k_b, fuente)
+                affine_cipher(fuente, k_a, k_b, destino)
 
             case '6':
+                Znkey = Zn_asterisco(95)
                 #Verificación de llave ingresada por el usuario
                 while True:
                     try:
                         k_a = int(input("Ingresa el valor de a: "))
                         k_b = int(input("Ingresa el valor de b: "))
-                        if (k_a in Znkey) and (k_b <= 9595):
+                        if (k_a in Znkey) and (k_b <= 95):
                             break
                         else:
                             print("La llave no es válida. Intente de nuevo.")
@@ -187,13 +204,15 @@ def main():
                         
                 #Verificación de la existencia del archivo fuente
                 while True:
-                    destino = input("Ingrese el nombre del archivo fuente + extensión: ")
+                    fuente = input("Ingrese el nombre del archivo fuente + extensión: ")
                     try:
                         with open(fuente, 'r') as f:
                             f.close()
                             break
                     except FileNotFoundError:
                         print("El archivo no existe. Intente de nuevo")
+
+                destino = input("Ingrese el nombre del archivo fuente + extensión: ")
                 
                 decipher(fuente, k_a, k_b, destino)
                 
@@ -208,5 +227,7 @@ def main():
 if __name__ == "__main__":
 
     main()
+
+
 
 
