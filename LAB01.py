@@ -43,7 +43,7 @@ def keygen():
     Znkey = Zn_asterisco(95)
     
     a = random.choice(Znkey)
-    b = inversoPrimo(95, a, Znkey)
+    b = random.choice(range(0, 95))
     
     return a, b, Znkey
 
@@ -61,6 +61,8 @@ def affine_cipher(plaintext, a, b, ciphertext):
     for caracter in text:
         if caracter == '\n':
             ciphered += '\n'
+        elif caracter == '\t':
+            ciphered += '\t'
         else:
             m = ord(caracter) - 32 
             cipher = ((a * m + b) % n) + 32 # Mantiene los caracteres dentro del rango 32 - 126
@@ -89,6 +91,8 @@ def decipher(ciphertext, a, b, plaintext):
     for caracter in cipher:
         if caracter == '\n':
             deciphered += '\n'
+        elif caracter == '\t':
+            deciphered += '\t'
         else:
             c = ord(caracter) - 32
             text = ((a_inv * (c-b)) % n) + 32 # Mantiene los caracteres dentro del rango 32 - 126
