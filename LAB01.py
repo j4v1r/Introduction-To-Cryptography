@@ -94,7 +94,7 @@ def main():
     #Menu Principal
     while True:
         print("---- LAB01 - AFFINE CIPHER ----")
-        print("Select an option: \n1. Calculate gcd of a and b \n2. Create Zn* list \n3. Find the multiplicative inverse of a in Zn* \n4. Generate random key K(a,b) \n5. Cipher a message \n6. Decipher message \n7. Exit")
+        print("Select an option: \n1. Compute gcd of a and b \n2. Create Zn* list \n3. Find the multiplicative inverse of a in Zn* \n4. Generate random key K(a,b) \n5. Cipher message \n6. Decipher message \n7. Exit")
         
         opcion = input("Option: ")
             
@@ -200,6 +200,9 @@ def main():
             case '7':
                 print("Saliendo del programa...")
                 break
+            
+            case _:
+                print("Opción no válida. Por favor, selecciona una opción del 1 al 7.")
             
                 
 if __name__ == "__main__":
