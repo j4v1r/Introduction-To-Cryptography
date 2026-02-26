@@ -145,19 +145,32 @@ def main():
                 print("El conjunto Z"+str(n)+"* es:", Zna) 
 
             case '3':
-                #Validar que el usuario ingrese un número entero perteneciente a Zn* para a.
+                #Validar que el usuario ingrese un número entero mayor o igual a 2 para n.
                 while True:
                     try:
-                        a = int(input("Ingresa un número mayor o igual a 2: "))
-                        if a in Zna:
+                        n = int(input("Ingresa un número mayor o igual a 2: "))
+                        if n >= 2:
+                            Znas=Zn_asterisco(n)
+                            #Validar que el usuario ingrese un número entero perteneciente a Zn* para a.
+                            while True:
+                                try:
+                                    a = int(input("Ingresa un número perteneciente a Zn*: "))
+                                    if a in Znas:
+                                        break;
+                                    else:
+                                        print("Entrada no válida. Por favor, ingresa un número perteneciente a Z"+str(n)+"*.")
+                                except ValueError:
+                                    print("Entrada no válida. Por favor, ingresa un número entero.")
+
+                            b =  inversoPrimo(n, a, Znas)
+                            print("El inverso multiplicativo de", a, "en Z"+str(n)+"* es:", b)
                             break;
                         else:
-                            print("Entrada no válida. Por favor, ingresa un número perteneciente a Z"+str(n)+"*.")
+                            print("Entrada no válida. Por favor, ingresa un número mayor o igual a 2.")
                     except ValueError:
                         print("Entrada no válida. Por favor, ingresa un número entero.")
 
-                b =  inversoPrimo(n, a, Zna)
-                print("El inverso multiplicativo de", a, "en Z"+str(n)+"* es:", b)
+                #print("El conjunto Z"+str(n)+"* es:", Zna) 
     
             case '4':
                 #Se desempaqueta la tupla devuelta por la función keygen()
