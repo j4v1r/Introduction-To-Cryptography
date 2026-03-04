@@ -1,4 +1,4 @@
-#LAB01.py - Affine Cipher
+#LAB02.py - Hill Cipher
 #February 26, 2026
 #Authors: Colunga Aguilar Javier Alejandro
 #         Valencia Rojas Berenice
@@ -226,6 +226,7 @@ def main():
                 print("Inverse key: ", inv_key)
             
             case '4':
+                n = 95
                 #Verificación de la llave ingresada
                 while True:
                     try:
@@ -260,6 +261,7 @@ def main():
                 hill_cipher(fuente, key, destino)
             
             case '5':
+                n = 95
                 while True:
                     #Verificación de la llave ingresada
                     try:
@@ -305,4 +307,5 @@ def main():
 
 
 if __name__ == "__main__":
+
     main()
