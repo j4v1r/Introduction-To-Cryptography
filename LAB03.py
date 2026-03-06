@@ -47,7 +47,11 @@ def perm_cipher(pi, fuente):
         block = fuente[i:i+block_size]
         perm_block = ""
         for j in range(block_size):
-            perm_block += block[pi[j]-1]
+            if(block[pi[j]-1] != " "):
+                perm_block += block[pi[j]-1]
+            else:
+                perm_block += "&"
+            #perm_block += block[pi[j]-1]
         ciphertext += perm_block
 
     return ciphertext
