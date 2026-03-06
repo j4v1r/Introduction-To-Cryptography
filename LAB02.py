@@ -162,7 +162,7 @@ def main():
                 while True:
                     try:
                         n = int(input("Enter a number greater than or equal to 2: "))
-                        a = int(input("Enter the value of n: "))
+                        a = int(input("Enter the value of a: "))
                         if (n >= 2) and ((a >= 0 ) and (a < n)):
                             break
                         elif n < 2:
@@ -299,9 +299,6 @@ def main():
 
             case _:
                 print("Invalid option. Please, enter an option from 1 to 6.")
-
-
-                        
 
 
 if __name__ == "__main__":
