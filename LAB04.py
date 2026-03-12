@@ -26,8 +26,9 @@ def generateKey():
     return key
 
 def encrypt_file(key, plaintext, ciphertext):
+    raw_key = base64.b64decode(key)
     iv = get_random_bytes(8) 
-    cipher = DES.new(key, DES.MODE_CBC, iv)
+    cipher = DES.new(raw_key, DES.MODE_CBC, iv)
     with open(plaintext, 'rb') as fuente:
         text = fuente.read()
     ciphered = cipher.encrypt(pad(plaintext, DES.block_size))
@@ -39,7 +40,7 @@ def encrypt_file(key, plaintext, ciphertext):
     print("Encrypted message saved in: ", ciphertext)
 
 def decrypt_file(key, fuente, destino):
-    
+    raw_key = base64.b64decode(key)
     with open(fuente, 'rb') as f:
         encoded = f.read()
     
@@ -48,7 +49,7 @@ def decrypt_file(key, fuente, destino):
     iv = data[:8]
     ciphertext = data[8:]
     
-    cipher = DES.new(key, DES.MODE_CBC, iv=iv)
+    cipher = DES.new(raw_key, DES.MODE_CBC, iv=iv)
     
     plaintext = unpad(cipher.decrypt(ciphertext), DES.block_size)
     
