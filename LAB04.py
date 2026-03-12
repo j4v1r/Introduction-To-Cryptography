@@ -22,8 +22,8 @@ def b64_bin(base64_string):
 
 def main():
     while True:
-        print("---- LAB03 - PERMUTATION CIPHER ----")
-        print("Select an option: \n1. Encode Binary String to Base64 \n2. Decode Base64 String to Binary\n3. Exit")
+        print("---- LAB04 - Block Ciphers 1 ----")
+        print("Select an option: \n1. Encode Binary String to Base64 \n2. Decode Base64 String to Binary \n3. Generate Random Key \n4. Encrypt File \n5. Decrypt File \n6. Exit")
 
         option = input("Option: ")
         
@@ -58,45 +58,47 @@ def main():
                 print("The binary string of", n, "encoded in base 64 is:", binary)
                 
             case '3':
-                while True:
-                    try:
-                        n = int(input("Enter the size of the permutation pi: "))
-                        if (n >= 3):
-                            i=0
-                            pi = []
-                            while(True):
-                                try:
-                                    k=int(input("Perm[" + str(i) + "]: "))
-                            
-                                    if (k <= 0 or k > n):
-                                        print("The number must be between 1 and ", n)
-                                    else:
-                                        pi.append(k)
-                                        i+=1
-                                    
-                                    if (i == n):
-                                        break
-                        
-                                except ValueError:
-                                    print("Please enter an integer.")
-                        
-                            break       
-                        else:
-                            print("The number must be greater or equal to 3.")
-                    except ValueError:
-                        print("Please enter an integer.")
-                        
-                while True:
-                    fuente = input("Enter the message to cipher (English alphabet): ")
-                    if all(c.isalpha() or c.isspace() for c in fuente):
-                        break
-                    else:
-                        print("Please enter a message containing only letters and spaces.")
-                        
-                cifrado = perm_cipher(pi, fuente)
-                print("Ciphered message: ", cifrado)
+                key = generateKey()
+                print("The random generated key is: ", key)
 
             case '4':
+                while True:
+                    fuente = input("Enter the source file name + extension: ")
+                    try:
+                        with open(fuente, 'r') as f:
+                            f.close()
+                            try:
+                                key = input("Enter the key to encrypt the file: ")
+                            except Exception as e:
+                                print("An error occurred during encryption:", str(e))
+                            break
+                    except FileNotFoundError:
+                        print("The file doesn't exist. Try again.")
+
+                destino = input("Enter the destination file name + extension: ")
+                
+                encrypt_file(fuente, destino, key)
+                print("File encrypted successfully on", destino)
+                
+            case '5':
+                while True:
+                    fuente = input("Enter the source file name + extension: ")
+                    try:
+                        with open(fuente, 'r') as f:
+                            f.close()
+                            try:
+                                key = input("Enter the key to encrypt the file: ")
+                            except Exception as e:
+                                print("An error occurred during encryption:", str(e))
+                            break
+                    except FileNotFoundError:
+                        print("The file doesn't exist. Try again.")
+
+                destino = input("Enter the destination file name + extension: ")
+                decrypt_file(fuente, destino, key)
+                print("File decrypted successfully on", destino)
+                
+            case '6':
                 print("Exiting the program...")
                 break
             
