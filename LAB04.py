@@ -1,5 +1,7 @@
 import base64
 from unittest import case
+from Crypto.Random import get_random_bytes
+from Crypto.Util.Padding import pad
 from Crypto.Util.Padding import unpad
 from Crypto.Cipher import DES
 
@@ -115,7 +117,7 @@ def main():
 
                 destino = input("Enter the destination file name + extension: ")
                 
-                encrypt_file(fuente, destino, key)
+                encrypt_file(key, fuente, destino)
                 print("File encrypted successfully on", destino)
                 
             case '5':
