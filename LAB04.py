@@ -1,9 +1,5 @@
 import base64
 from unittest import case
-
-
-
-
 from Crypto.Util.Padding import unpad
 from Crypto.Cipher import DES
 
@@ -24,6 +20,23 @@ def b64_bin(base64_string):
     
     return binary_string
 
+def generateKey():
+    key = base64.b64encode(get_random_bytes(8))
+    print("Key (b64): ", key)
+    return key
+
+def encrypt_file(key, plaintext, ciphertext):
+    iv = get_random_bytes(8) 
+    cipher = DES.new(key, DES.MODE_CBC, iv)
+    with open(plaintext, 'rb') as fuente:
+        text = fuente.read()
+    ciphered = cipher.encrypt(pad(plaintext, DES.block_size))
+
+    with open(ciphertext, 'wb') as salida:
+        encoded = base64.b64encode(iv+ciphered)
+        salida.write(encoded)
+
+    print("Encrypted message saved in: ", ciphertext)
 
 def decrypt_file(key, fuente, destino):
     
