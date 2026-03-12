@@ -23,7 +23,7 @@ def b64_bin(base64_string):
 def main():
     while True:
         print("---- LAB03 - PERMUTATION CIPHER ----")
-        print("Select an option: \n1. Encode Binary String to Base64 \n2. Decode Base64 String to Binary \n3. Encrypt Message \n4. Decrypt Message \n5. Exit")
+        print("Select an option: \n1. Encode Binary String to Base64 \n2. Decode Base64 String to Binary\n3. Exit")
 
         option = input("Option: ")
         
