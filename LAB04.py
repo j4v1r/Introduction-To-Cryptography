@@ -1,6 +1,12 @@
 import base64
 from unittest import case
 
+
+
+
+from Crypto.Util.Padding import unpad
+from Crypto.Cipher import DES
+
 def bin_b64(bin_string):
     
     byte_data = int(bin_string, 2).to_bytes((len(bin_string) + 7) // 8, byteorder='big')
@@ -19,11 +25,30 @@ def b64_bin(base64_string):
     return binary_string
 
 
+def decrypt_file(key, fuente, destino):
+    
+    with open(fuente, 'rb') as f:
+        encoded = f.read()
+    
+    data = base64.b64decode(encoded)
+    
+    iv = data[:8]
+    ciphertext = data[8:]
+    
+    cipher = DES.new(key, DES.MODE_CBC, iv=iv)
+    
+    plaintext = unpad(cipher.decrypt(ciphertext), DES.block_size)
+    
+    with open(destino, 'wb') as f:
+        f.write(plaintext)
+    
+    print("File decrypted successfully.")
 
 def main():
     while True:
         print("---- LAB04 - Block Ciphers 1 ----")
-        print("Select an option: \n1. Encode Binary String to Base64 \n2. Decode Base64 String to Binary \n3. Generate Random Key \n4. Encrypt File \n5. Decrypt File \n6. Exit")
+        print("Select an option: \n1. Encode Binary String to Base64 \n2. Decode Base64 String to Binary \n3. Generate Random Key")
+        print("4. Encrypt File \n5. Decrypt File \n6. Exit")
 
         option = input("Option: ")
         
@@ -95,7 +120,7 @@ def main():
                         print("The file doesn't exist. Try again.")
 
                 destino = input("Enter the destination file name + extension: ")
-                decrypt_file(fuente, destino, key)
+                decrypt_file(key, fuente, destino)
                 print("File decrypted successfully on", destino)
                 
             case '6':
