@@ -1,6 +1,7 @@
 import base64
 from unittest import case
-from Crypto.Util.Padding import unpad
+from Crypto.Random import get_random_bytes
+from Crypto.Util.Padding import pad, unpad
 from Crypto.Cipher import DES
 
 def bin_b64(bin_string):
@@ -22,7 +23,6 @@ def b64_bin(base64_string):
 
 def generateKey():
     key = base64.b64encode(get_random_bytes(8))
-    print("Key (b64): ", key)
     return key
 
 def encrypt_file(key, plaintext, ciphertext):
@@ -31,7 +31,7 @@ def encrypt_file(key, plaintext, ciphertext):
     cipher = DES.new(raw_key, DES.MODE_CBC, iv)
     with open(plaintext, 'rb') as fuente:
         text = fuente.read()
-    ciphered = cipher.encrypt(pad(plaintext, DES.block_size))
+    ciphered = cipher.encrypt(pad(text, DES.block_size))
 
     with open(ciphertext, 'wb') as salida:
         encoded = base64.b64encode(iv+ciphered)
@@ -116,7 +116,7 @@ def main():
 
                 destino = input("Enter the destination file name + extension: ")
                 
-                encrypt_file(fuente, destino, key)
+                encrypt_file(key, fuente, destino)
                 print("File encrypted successfully on", destino)
                 
             case '5':
