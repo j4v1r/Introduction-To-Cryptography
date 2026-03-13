@@ -1,3 +1,8 @@
+#LAB03.py - Permutation Cipher
+#March 5, 2026
+#Authors: Colunga Aguilar Javier Alejandro
+#         Valencia Rojas Berenice
+
 import math
 import random
 
