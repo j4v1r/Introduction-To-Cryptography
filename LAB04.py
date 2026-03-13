@@ -1,4 +1,5 @@
 import base64
+import os
 from unittest import case
 from Crypto.Random import get_random_bytes
 from Crypto.Util.Padding import pad, unpad
@@ -37,8 +38,6 @@ def encrypt_file(key, plaintext, ciphertext):
         encoded = base64.b64encode(iv+ciphered)
         salida.write(encoded)
 
-    print("Encrypted message saved in: ", ciphertext)
-
 def decrypt_file(key, fuente, destino):
     raw_key = base64.b64decode(key)
     with open(fuente, 'rb') as f:
@@ -55,8 +54,6 @@ def decrypt_file(key, fuente, destino):
     
     with open(destino, 'wb') as f:
         f.write(plaintext)
-    
-    print("File decrypted successfully.")
 
 def main():
     while True:
@@ -103,6 +100,10 @@ def main():
             case '4':
                 while True:
                     fuente = input("Enter the source file name + extension: ")
+                    file_size = os.path.getsize(fuente)/1024
+                    if file_size < 100:
+                        print(f"File too small ({file_size:.2f} kB). Please enter a file bigger than 100kB.")
+                        continue
                     try:
                         with open(fuente, 'r') as f:
                             f.close()
@@ -126,9 +127,9 @@ def main():
                         with open(fuente, 'r') as f:
                             f.close()
                             try:
-                                key = input("Enter the key to encrypt the file: ")
+                                key = input("Enter the key to decrypt the file: ")
                             except Exception as e:
-                                print("An error occurred during encryption:", str(e))
+                                print("An error occurred during decryption:", str(e))
                             break
                     except FileNotFoundError:
                         print("The file doesn't exist. Try again.")
