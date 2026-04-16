@@ -95,7 +95,7 @@ def main():
                 
             case '3':
                 key = generateKey()
-                print("The random generated key is: ", key.decode('utf-8')
+                print("The random generated key is: ", key.decode('utf-8'))
 
             case '4':
                 while True:
