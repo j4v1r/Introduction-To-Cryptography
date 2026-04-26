@@ -9,27 +9,31 @@ bool loadS(unsigned char S[256]);
 void key_expansion(unsigned short int K, unsigned char S[256], unsigned char W[4]);
 void generateKey();
 void generateKeyAndSBox();
-void cipher();
+void cipher(char M[3]);
+void decipher(unsigned short int C);
 
 int main(){
 
     bool seguir = true;
 
     while(seguir){
-        printf("\nLAB07 - Tiny Block Cipher\n");
+        printf("\nLAB08 - Tiny Block Cipher II\n");
 
         printf("1. Key Expansion\n");
         printf("2. Generate random key 'K' and S-Box(8))\n");
         printf("3. Cipher 'M' plaintext\n");
-        printf("4. Exit\n");
+        printf("4. Decipher 'C' ciphertext\n");
+        printf("5. Exit\n");
 
         int option;
         printf("Select an option: ");
         scanf("%i", &option);
 
         int l;
+        char M[3];
         unsigned char W[4];
         unsigned char S[256];
+        unsigned short int C;
         unsigned short int K;
 
         switch(option){
@@ -43,9 +47,16 @@ int main(){
                 generateKeyAndSBox();
                 break;
             case 3:
-                cipher();
+                printf("\nEnter M(2 ascii chars): ");
+                scanf("%2s", M);
+                cipher(M);
                 break;
             case 4:
+                printf("\nEnter C(hex): ");
+                scanf("%hx", &C);
+                decipher(C);
+                break;
+            case 5:
                 seguir = false;
                 break;
             default:
@@ -188,14 +199,14 @@ void key_expansion(unsigned short int K, unsigned char S[256], unsigned char W[4
     W[2] = w4;
     W[3] = w5;
 
-    /*
+    
     printf("\nExpanded Key:\n");
     printf("w0: %02X\n", w0);   
     printf("w1: %02X\n", w1);
     printf("w2: %02X\n", w2);
     printf("w3: %02X\n", w3);
     printf("w4: %02X\n", w4);
-    printf("w5: %02X\n", w5);*/
+    printf("w5: %02X\n", w5);
 
     return;
 }
@@ -233,7 +244,7 @@ void generateKeyAndSBox(){
 }
 
 //Ciphers a plaintext 'M' using the expanded key generated from a random key 'K' and a random S-Box of l=8, then prints the ciphertext
-void cipher(){
+void cipher(char M[3]){
 
     unsigned short int K;
     unsigned short int KEYS[3];
@@ -241,15 +252,10 @@ void cipher(){
     unsigned char W[4];
     unsigned char S[256];
     
-    char M[3];
     char C[2];
-    unsigned char m0;
-    unsigned char m1;
 
-    printf("\nEnter M(2 ascii chars): ");
-    scanf("%2s", M);
-    m0 = M[0];
-    m1 = M[1];
+    unsigned char m0 = M[0];
+    unsigned char m1 = M[1];
 
     if(loadS(S) && loadKey(&K)){
 
@@ -276,3 +282,49 @@ void cipher(){
         printf("Failed to load S-Box or Key.\n");
     }   
 }
+
+//Deciphers a ciphertext 'C' using the expanded key generated from a random key 'K' and a random S-Box of l=8, then prints the plaintext
+void decipher(unsigned short int C){
+
+    unsigned short int K;
+    unsigned short int KEYS[3];
+
+    unsigned char W[4];
+    unsigned char S[256];
+    unsigned char S_INV[256];
+    
+    char M[3];
+
+    unsigned char c0 = C>>8;
+    unsigned char c1 = C&0xFF;
+
+    if(loadS(S) && loadKey(&K)){
+
+        key_expansion(K,S,W);
+
+        KEYS[0] = K;
+        KEYS[1] = (W[0] << 8) | W[1];
+        KEYS[2] = (W[2] << 8) | W[3];
+
+        for(int i=0; i<256; i++){
+            S_INV[S[i]] = i;
+        }
+
+        for(int j=2; j>=0; j--){
+            c0 = S_INV[c0];
+            c1 = S_INV[c1];
+            c0 = c0 ^ (KEYS[j] >> 8);
+            c1 = c1 ^ (KEYS[j] & 0xFF);
+        }
+
+        M[0] = c0;
+        M[1] = c1;
+        M[2] = '\0';
+
+        printf("\nPlaintext: %s\n", M); 
+
+    } else {
+        printf("Failed to load S-Box or Key.\n");
+    }   
+}
+
