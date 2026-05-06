@@ -6,10 +6,14 @@
 
 void generateS(int l);
 bool loadS(unsigned char S[256]);
+bool loadKey(unsigned short int *K);
+bool loadPermutation(int perm[8]);
 void key_expansion(unsigned short int K, unsigned char S[256], unsigned char W[4]);
 void generateKey();
+void generatePermutation();
+unsigned char permutate(unsigned char s, int P[8]);
 void generateKeyAndSBox();
-void cipher(char M[3]);
+void cipher(unsigned char M[3]);
 void decipher(unsigned short int C);
 
 int main(){
@@ -30,7 +34,7 @@ int main(){
         scanf("%i", &option);
 
         int l;
-        char M[3];
+        unsigned char M[3];
         unsigned char W[4];
         unsigned char S[256];
         unsigned short int C;
@@ -48,7 +52,7 @@ int main(){
                 break;
             case 3:
                 printf("\nEnter M(2 ascii chars): ");
-                scanf("%2s", M);
+                scanf("%2s", (char*)M);
                 cipher(M);
                 break;
             case 4:
@@ -162,6 +166,27 @@ bool loadKey(unsigned short int *K){
     return true;
 }
 
+//Loads a permutation of size 8 from a file into an array, returns true if successful, false otherwise
+bool loadPermutation(int perm[8]) {
+    char filename[100];
+    printf("Enter the file name where the permutation is stored: ");
+    scanf("%99s", filename);
+    FILE *f = fopen(filename, "r");
+    if (!f){
+        return false;
+    }
+
+    for (int i = 0; i < 8; i++) {
+        if (fscanf(f, "%d", &perm[i]) != 1) {
+            fclose(f);
+            return false;
+        }
+    }
+
+    fclose(f);
+    return true;
+}  
+
 //Performs XOR operations on a short int 'K' with the substituted values of its nibbles using a 4-bit S-Box, and then substitutes the result using the same S-Box
 void key_expansion(unsigned short int K, unsigned char S[256], unsigned char W[4]){
 
@@ -199,14 +224,14 @@ void key_expansion(unsigned short int K, unsigned char S[256], unsigned char W[4
     W[2] = w4;
     W[3] = w5;
 
-    
+    /*
     printf("\nExpanded Key:\n");
     printf("w0: %02X\n", w0);   
     printf("w1: %02X\n", w1);
     printf("w2: %02X\n", w2);
     printf("w3: %02X\n", w3);
     printf("w4: %02X\n", w4);
-    printf("w5: %02X\n", w5);
+    printf("w5: %02X\n", w5);*/
 
     return;
 }
@@ -237,27 +262,74 @@ void generateKey(){
     fclose(fptr);
 }
 
+//Generates a random permutation of size 8 and stores it in an array, then prints the permutation
+void generatePermutation() {
+    int perm[8];
+    char filename[100];
+
+    for (int i = 0; i < 8; i++) {
+        perm[i] = i;
+    }
+
+    for (int i = 7; i > 0; i--) {
+        int j = rand() % (i + 1);
+        int temp = perm[i];
+        perm[i] = perm[j];
+        perm[j] = temp;
+    }
+
+    printf("Enter the file name to store the permutation: ");
+    scanf("%99s", filename);
+    FILE *f = fopen(filename, "w");
+
+    if (!f) {
+        printf("Error opening file\n");
+        return;
+    }
+
+    for (int i = 0; i < 8; i++) {
+        fprintf(f, "%d ", perm[i]);
+    }
+
+    fclose(f);
+    printf("Permutation stored in %s\n", filename);
+}
+
 //Calls generateKey() to create a random key 'K' and store it in a file, then calls generateS() to create a random S-Box of l=8and store it in a file
 void generateKeyAndSBox(){
-    generateKey();
     generateS(8);
+    generateKey();
+    generatePermutation();
+}
+
+//Permutes the bits of a byte 'x' according to a given permutation 'P' and returns the permuted byte
+unsigned char permutate(unsigned char s, int P[8]) {
+    unsigned char y = 0;
+
+    for (int i = 0; i < 8; i++) {
+        unsigned char bit = (s >> P[i]) & 1; 
+        y |= (bit << i);
+    }
+
+    return y;
 }
 
 //Ciphers a plaintext 'M' using the expanded key generated from a random key 'K' and a random S-Box of l=8, then prints the ciphertext
-void cipher(char M[3]){
+void cipher(unsigned char M[3]){
 
+    int perm[8];
     unsigned short int K;
     unsigned short int KEYS[3];
 
     unsigned char W[4];
     unsigned char S[256];
     
-    char C[2];
+    unsigned char C[2];
 
-    unsigned char m0 = M[0];
-    unsigned char m1 = M[1];
+    unsigned char m0 = (unsigned char)M[0];
+    unsigned char m1 = (unsigned char)M[1];
 
-    if(loadS(S) && loadKey(&K)){
+    if(loadS(S) && loadKey(&K) && loadPermutation(perm)){
 
         key_expansion(K,S,W);
 
@@ -268,8 +340,16 @@ void cipher(char M[3]){
         for(int j=0; j<=2; j++){
             m0 = m0 ^ (KEYS[j] >> 8);
             m1 = m1 ^ (KEYS[j] & 0xFF);
+            //printf("\nRound %d\n", j);
+           // printf("After XOR: %02X %02X\n", m0, m1);
+
             m0 = S[m0];
             m1 = S[m1];
+            //printf("After S: %02X %02X\n", m0, m1);
+
+            m0 = permutate(m0, perm);
+            m1 = permutate(m1, perm);
+            //printf("After P: %02X %02X\n", m0, m1);
         }
 
         C[0] = m0;
@@ -286,6 +366,8 @@ void cipher(char M[3]){
 //Deciphers a ciphertext 'C' using the expanded key generated from a random key 'K' and a random S-Box of l=8, then prints the plaintext
 void decipher(unsigned short int C){
 
+    int perm[8];
+    int perm_inv[8];
     unsigned short int K;
     unsigned short int KEYS[3];
 
@@ -298,7 +380,7 @@ void decipher(unsigned short int C){
     unsigned char c0 = C>>8;
     unsigned char c1 = C&0xFF;
 
-    if(loadS(S) && loadKey(&K)){
+    if(loadS(S) && loadKey(&K) && loadPermutation(perm)){
 
         key_expansion(K,S,W);
 
@@ -310,7 +392,13 @@ void decipher(unsigned short int C){
             S_INV[S[i]] = i;
         }
 
+        for(int i = 0; i < 8; i++) {
+            perm_inv[perm[i]] = i;
+        }
+
         for(int j=2; j>=0; j--){
+            c0 = permutate(c0, perm_inv);
+            c1 = permutate(c1, perm_inv);
             c0 = S_INV[c0];
             c1 = S_INV[c1];
             c0 = c0 ^ (KEYS[j] >> 8);
