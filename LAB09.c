@@ -15,6 +15,7 @@ unsigned char permutate(unsigned char s, int P[8]);
 void generateKeyAndSBox();
 unsigned short int TBC(unsigned char M[3], int perm[8], unsigned char S[256], unsigned short int K);
 void TBDC(unsigned short int C);
+void readPlain(unsigned char M[], int max);
 int readCipher(unsigned short int C[]);
 void cipher(unsigned char M[]);
 void decipher(unsigned short int C[], int total);
@@ -49,8 +50,7 @@ int main(){
                 generateKeyAndSBox();
                 break;
             case 2:
-                printf("\nEnter M: ");
-                scanf("%s", M);
+                readPlain(M, 100);
                 cipher(M);
                 break;
             case 3:
@@ -415,11 +415,22 @@ void TBDC(unsigned short int C){
     }   
 }
 
+void readPlain(unsigned char M[], int max) {
+    printf("\nEnter plaintext: ");
+    getchar();
+    fgets((char *)M, max, stdin);
+
+    int len = strlen((char *)M);
+    if(M[len-1] == '\n') {
+        M[len-1] = '\0';
+    }
+}
+
 //Reads a ciphertext 'C' from user input, stores it in an array, and returns the total number of elements read
 int readCipher(unsigned short int C[]) {
     int total = 0;
 
-    printf("\nEnter ciphertext separated by spaces, press ENTER to finish): ");
+    printf("\nEnter ciphertext separated by spaces, press ENTER to finish: ");
 
     while (1) {
         unsigned short int temp;
@@ -441,13 +452,12 @@ int readCipher(unsigned short int C[]) {
 void cipher(unsigned char M[]){
 
     int len = strlen(M);
-    int num = len/2;
+    int num = (len + 1) / 2; 
 
     unsigned char c0 = rand() % 256;
     unsigned char c1 = 0;
     unsigned char ci[3];
 
-    unsigned char x0,x1;
     unsigned short int stream;
     unsigned short int Xi,Yi;
 
@@ -468,8 +478,8 @@ void cipher(unsigned char M[]){
             stream = TBC(ci, perm, S, K);
             //printf("Stream for block %d: %04X\n", i, stream);
 
-            x0 = M[2*i];
-            x1 = M[(2*i)+1];
+            unsigned char x0 = M[2*i];
+            unsigned char x1 = M[(2*i)+1];
             Xi = (x0 << 8) | x1;
 
             Yi = stream ^ Xi;
