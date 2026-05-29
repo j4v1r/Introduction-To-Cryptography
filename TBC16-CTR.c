@@ -17,7 +17,6 @@ bool loadKey(char *filename, unsigned short int *K);
 bool loadPermutation(int perm[8]);
 char *readText(char *filename, int *output_size);
 void key_expansion(unsigned short int K, unsigned char S[256], unsigned char W[4]);
-void generatePermutation();
 unsigned char permutate(unsigned char s, int P[8]);
 unsigned short int TBC(unsigned short int K, char M[2]);
 void CTR_E(char *TextFile, char *KeyFile);
@@ -259,6 +258,12 @@ bool loadS(unsigned char S[256])
 
     fptr = fopen(filename, "r");
 
+    if (!fptr)
+    {
+        printf("Error opening file %s\n", filename);
+        return false;
+    }
+
     int entrada, salida;
     while (fscanf(fptr, " %x -> %x", &entrada, &salida) == 2)
     {
@@ -325,9 +330,9 @@ char *readText(char *filename, int *output_size)
 
     int capacity = 1024;
     int size = 0;
-    char *buffer = malloc(capacity);
+    unsigned char *buffer = malloc(capacity);
 
-    char temp[512];
+    unsigned char temp[512];
     int read;
 
     while ((read = fread(temp, 1, 512, fptr)) > 0)
@@ -400,7 +405,7 @@ unsigned char permutate(unsigned char s, int P[8])
 }
 
 // Ciphers a plaintext 'M' using the expanded key generated from a random key 'K' and a random S-Box of l=8, then prints the ciphertext
-unsigned short int TBC(unsigned short int K, char M[3])
+unsigned short int TBC(unsigned short int K, char M[2])
 {
 
     int perm[8] = {4, 1, 7, 0, 6, 2, 5, 3};
@@ -443,6 +448,7 @@ unsigned short int TBC(unsigned short int K, char M[3])
     else
     {
         printf("Failed to load S-Box or Key.\n");
+        return 0;
     }
 }
 
@@ -457,7 +463,7 @@ void CTR_E(char *TextFile, char *KeyFile)
     unsigned char c1 = 0;
     unsigned short int enc, K;
 
-    unsigned char *ciphertext = malloc(len + 1);
+    unsigned char *ciphertext = malloc(len + 2);
     ciphertext[0] = c0;
 
     loadKey(KeyFile, &K);
@@ -469,7 +475,7 @@ void CTR_E(char *TextFile, char *KeyFile)
         counter[0] = c0;
         counter[1] = c1;
 
-        enc = TBC(K, counter);
+        enc = TBC(K, (char *)counter);
         unsigned char msb = (enc >> 8) & 0xFF;
         unsigned char lsb = enc & 0xFF;
 
@@ -488,7 +494,7 @@ void CTR_E(char *TextFile, char *KeyFile)
 
     saveFile(ciphertext, aux, filename, 0);
 
-    printf("Succesfully encripted in %s.\n", filename);
+    printf("Succesfully encripted in %s\n", filename);
 
     free(plaintext);
     free(ciphertext);
@@ -504,8 +510,12 @@ void CTR_D(char *TextFile, char *KeyFile)
     int inputLen = 0;
 
     char *input = readText(TextFile, &inputLen);
-    unsigned char *ciphertext = malloc(inputLen);
-    int totalBytes = base64Decode((char *)input, ciphertext);
+    while (inputLen > 0 && (input[inputLen - 1] == '\n' || input[inputLen - 1] == '\r'))
+        inputLen--;
+    input[inputLen] = '\0';
+
+    unsigned char *ciphertext = malloc(inputLen + 4);
+    int totalBytes = base64Decode(input, ciphertext);
 
     c0 = ciphertext[0];
 
@@ -542,7 +552,7 @@ void CTR_D(char *TextFile, char *KeyFile)
 
     saveFile(plaintext, aux, filename, 1);
 
-    printf("Succesfully decripted in %s.\n", filename);
+    printf("Succesfully decrypted in %s.\n", filename);
 
     free(input);
     free(ciphertext);
@@ -564,7 +574,7 @@ void saveFile(unsigned char *text, int length, char *filename, int mode)
     // Ciphertext -> Mode = 0
     if (mode == 0)
     {
-        int encodedSize = (length * 4 / 3) + 4;
+        int encodedSize = ((length + 2) / 3) * 4 + 4;
         char *encoded = malloc(encodedSize);
 
         base64Encode(text, length, encoded);
