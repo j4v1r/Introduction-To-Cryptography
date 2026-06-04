@@ -54,6 +54,28 @@ def encrypt_ctr(plaintext_file, key, ciphertext_file):
     with open(ciphertext_file, "w") as f:
         f.write(base64.b64encode(iv + ciphertext).decode())
 
+def decrypt_ctr(ciphertext_file, key, plaintext_file):
+
+    # Read ciphertext from file
+    with open(ciphertext_file, "r") as f:
+        source = base64.b64decode(f.read())
+
+    # Obtains the 16-byte nonce/counter used in CTR mode
+    iv = source[:16]
+    ciphertext = source[16:]
+
+    cipher = Cipher(algorithms.AES(key), modes.CTR(iv))
+
+    decryptor = cipher.decryptor()
+
+    plaintext = decryptor.update(ciphertext) + decryptor.finalize()
+
+    #Save recovered plaintext to file
+    with open(plaintext_file, "wb") as f:
+        f.write(plaintext)                         
+
+    
+
 def main():
     while True:
         print("\n---- LAB11 - AES-CTR ----")
@@ -93,7 +115,19 @@ def main():
                 encrypt_ctr(plaintext_file, key, ciphertext_file)
                 
             case '3':  
-                print("Decryption functionality is not implemented yet.")
+                while True:
+                    try:
+                        key_file = input("Enter the file containing the AES key: ")
+                        with open(key_file, "r") as f:
+                            key_b64 = f.read().strip()
+                        key = base64.b64decode(key_b64)
+                        ciphertext_file = input("Enter the ciphertext file name: ")
+                        plaintext_file = input("Enter the name for the output plaintext: ")
+                        break
+                    except (FileNotFoundError, ValueError):
+                        print("Please enter a valid key file.")
+                        
+                decrypt_ctr(ciphertext_file, key, plaintext_file)
             case '4':
                 print("Exiting...")
                 break
