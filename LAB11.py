@@ -54,6 +54,7 @@ def encrypt_ctr(plaintext_file, key, ciphertext_file):
     with open(ciphertext_file, "w") as f:
         f.write(base64.b64encode(iv + ciphertext).decode())
 
+#Decryption is performed using the same key and IV (nonce) that were used for encryption. The ciphertext is decoded from Base64, and the plaintext is recovered and printed.
 def decrypt_ctr(ciphertext_file, key, plaintext_file):
 
     # Read ciphertext from file
@@ -73,7 +74,6 @@ def decrypt_ctr(ciphertext_file, key, plaintext_file):
     #Save recovered plaintext to file
     with open(plaintext_file, "wb") as f:
         f.write(plaintext)                         
-
     
 
 def main():
